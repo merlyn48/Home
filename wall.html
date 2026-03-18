@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home — The Wall</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=EB+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0c0b10;
+      --text: #e8dcc8;
+      --text-dim: #9e8f7a;
+      --accent: #c8a96e;
+      --accent-soft: rgba(200, 169, 110, 0.12);
+      --candle: #f4a940;
+      --border: rgba(255,255,255,0.07);
+      --card-bg: rgba(255,255,255,0.03);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'EB Garamond', serif;
+      min-height: 100vh;
+    }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+      opacity: 0;
+      animation: twinkle var(--d) ease-in-out infinite var(--delay);
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; }
+      50% { opacity: var(--op); }
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 2.5rem;
+      background: linear-gradient(to bottom, rgba(12,11,16,0.95), transparent);
+      backdrop-filter: blur(4px);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 1.5rem;
+      letter-spacing: 0.3em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .post-btn {
+      padding: 0.5rem 1.4rem;
+      border: 1px solid var(--accent);
+      color: var(--accent) !important;
+      border-radius: 2px;
+      transition: all 0.3s ease !important;
+    }
+    .post-btn:hover {
+      background: var(--accent-soft) !important;
+    }
+
+    /* MAIN */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 7rem 2rem 4rem;
+    }
+
+    .wall-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.2s;
+    }
+    .wall-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 2rem;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+    }
+    .wall-header p {
+      margin-top: 0.5rem;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--text-dim);
+      opacity: 0.6;
+    }
+
+    /* FILTERS */
+    .filters {
+      display: flex;
+      gap: 0.7rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.4s;
+    }
+    .filter-btn {
+      padding: 0.4rem 1.1rem;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      font-family: 'EB Garamond', serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      border-radius: 20px;
+      transition: all 0.3s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    /* CARDS */
+    .wall {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .thought-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.6rem 1.8rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .thought-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--tag-color, var(--accent));
+      opacity: 0.5;
+    }
+    .thought-card:hover {
+      border-color: rgba(200,169,110,0.2);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+    }
+
+    .card-tag {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--tag-color, var(--accent));
+      opacity: 0.7;
+      margin-bottom: 0.8rem;
+    }
+
+    .card-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--text);
+      font-style: italic;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.2rem;
+    }
+
+    .card-time {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      opacity: 0.5;
+      letter-spacing: 0.05em;
+    }
+
+    .candle-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-dim);
+      font-family: 'EB Garamond', serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      transition: all 0.3s;
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      border: 1px solid transparent;
+    }
+    .candle-btn:hover {
+      color: var(--candle);
+      border-color: rgba(244,169,64,0.2);
+      background: rgba(244,169,64,0.05);
+    }
+    .candle-btn.lit {
+      color: var(--candle);
+      border-color: rgba(244,169,64,0.3);
+      background: rgba(244,169,64,0.08);
+    }
+    .candle-btn .flame {
+      font-size: 1rem;
+      transition: filter 0.3s;
+    }
+    .candle-btn.lit .flame {
+      filter: drop-shadow(0 0 4px rgba(244,169,64,0.8));
+      animation: flicker 2s ease-in-out infinite;
+    }
+    @keyframes flicker {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15) rotate(3deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-dim);
+      font-style: italic;
+      opacity: 0.5;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Tag colors */
+    .tag-wish { --tag-color: #a8c5da; }
+    .tag-regret { --tag-color: #c4a0b0; }
+    .tag-prayer { --tag-color: #b8c4a0; }
+    .tag-thought { --tag-color: #c8a96e; }
+  </style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">Home</a>
+  <div class="nav-links">
+    <a href="random.html">a stranger's world</a>
+    <a href="post.html" class="post-btn">+ leave something</a>
+  </div>
+</nav>
+
+<main>
+  <div class="wall-header">
+    <h2>the wall</h2>
+    <p>thoughts left by strangers, just like you.</p>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all">all</button>
+    <button class="filter-btn" data-filter="wish">wishes</button>
+    <button class="filter-btn" data-filter="regret">regrets</button>
+    <button class="filter-btn" data-filter="prayer">prayers</button>
+    <button class="filter-btn" data-filter="thought">thoughts</button>
+  </div>
+
+  <div class="wall" id="wall">
+    <div class="empty-state" id="empty">no one has left anything yet.<br>be the first.</div>
+  </div>
+</main>
+
+<script>
+  // Stars
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${3+Math.random()*5}s;--delay:${Math.random()*6}s;--op:${0.1+Math.random()*0.4};width:${1+Math.random()*1.5}px;height:${1+Math.random()*1.5}px;`;
+    starsEl.appendChild(s);
+  }
+
+  const tagColors = { wish: 'tag-wish', regret: 'tag-regret', prayer: 'tag-prayer', thought: 'tag-thought' };
+
+  function getPosts() {
+    return JSON.parse(localStorage.getItem('home-posts') || '[]');
+  }
+
+  function savePosts(posts) {
+    localStorage.setItem('home-posts', JSON.stringify(posts));
+  }
+
+  function timeAgo(ts) {
+    const diff = Date.now() - ts;
+    const m = Math.floor(diff / 60000);
+    const h = Math.floor(m / 60);
+    const d = Math.floor(h / 24);
+    if (m < 1) return 'just now';
+    if (m < 60) return `${m}m ago`;
+    if (h < 24) return `${h}h ago`;
+    return `${d}d ago`;
+  }
+
+  function renderPosts(filter = 'all') {
+    const wall = document.getElementById('wall');
+    const empty = document.getElementById('empty');
+    const posts = getPosts().filter(p => filter === 'all' || p.tag === filter);
+
+    if (posts.length === 0) {
+      empty.style.display = 'block';
+      const cards = wall.querySelectorAll('.thought-card');
+      cards.forEach(c => c.remove());
+      return;
+    }
+    empty.style.display = 'none';
+
+    // Clear existing cards
+    wall.querySelectorAll('.thought-card').forEach(c => c.remove());
+
+    // Render newest first
+    [...posts].reverse().forEach((post, i) => {
+      const card = document.createElement('div');
+      card.className = `thought-card ${tagColors[post.tag] || ''}`;
+      card.style.animationDelay = `${0.1 + i * 0.07}s`;
+
+      const candleLit = (post.candledBy || []).includes('me') ? 'lit' : '';
+
+      card.innerHTML = `
+        <div class="card-tag">${post.tag}</div>
+        <div class="card-text">${post.text}</div>
+        <div class="card-footer">
+          <span class="card-time">someone, ${timeAgo(post.ts)}</span>
+          <button class="candle-btn ${candleLit}" data-id="${post.id}">
+            <span class="flame">🕯️</span>
+            <span class="count">${post.candles || 0}</span>
+          </button>
+        </div>
+      `;
+      wall.appendChild(card);
+    });
+
+    // Candle interactions
+    wall.querySelectorAll('.candle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const posts = getPosts();
+        const post = posts.find(p => p.id === id);
+        if (!post) return;
+
+        if (!post.candledBy) post.candledBy = [];
+        if (post.candledBy.includes('me')) {
+          post.candledBy = post.candledBy.filter(x => x !== 'me');
+          post.candles = Math.max(0, (post.candles || 1) - 1);
+          btn.classList.remove('lit');
+        } else {
+          post.candledBy.push('me');
+          post.candles = (post.candles || 0) + 1;
+          btn.classList.add('lit');
+        }
+        btn.querySelector('.count').textContent = post.candles;
+        savePosts(posts);
+      });
+    });
+  }
+
+  // Filters
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderPosts(btn.dataset.filter);
+    });
+  });
+
+  renderPosts();
+</script>
+</body>
+</html>
