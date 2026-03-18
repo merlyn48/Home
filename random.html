@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home — A Stranger's World</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=EB+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0c0b10;
+      --text: #e8dcc8;
+      --text-dim: #9e8f7a;
+      --accent: #c8a96e;
+      --accent-soft: rgba(200,169,110,0.12);
+      --candle: #f4a940;
+      --border: rgba(255,255,255,0.07);
+      --card-bg: rgba(255,255,255,0.03);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'EB Garamond', serif;
+      overflow: hidden;
+    }
+
+    .stars {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+    }
+    .star {
+      position: absolute; background: #fff;
+      border-radius: 50%; opacity: 0;
+      animation: twinkle var(--d) ease-in-out infinite var(--delay);
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; }
+      50% { opacity: var(--op); }
+    }
+
+    .glow {
+      position: fixed;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,169,110,0.04) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none; z-index: 0;
+      animation: pulse 8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: 0.5; }
+      50% { transform: translate(-50%,-50%) scale(1.2); opacity: 1; }
+    }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 2.5rem;
+      background: linear-gradient(to bottom, rgba(12,11,16,0.95), transparent);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-size: 1.5rem;
+      letter-spacing: 0.3em; color: var(--text);
+      text-decoration: none;
+    }
+    .back-link {
+      color: var(--text-dim); text-decoration: none;
+      font-size: 0.9rem; letter-spacing: 0.1em;
+      transition: color 0.3s;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    main {
+      position: relative; z-index: 1;
+      height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* Tag colors */
+    .tag-wish { --tag-c: #a8c5da; }
+    .tag-regret { --tag-c: #c4a0b0; }
+    .tag-prayer { --tag-c: #b8c4a0; }
+    .tag-thought { --tag-c: #c8a96e; }
+
+    .thought-display {
+      max-width: 560px;
+      width: 100%;
+      opacity: 0;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      transform: translateY(10px);
+    }
+    .thought-display.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tag-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--tag-c, var(--accent));
+      opacity: 0.6;
+      margin-bottom: 2rem;
+    }
+
+    .thought-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(1.4rem, 3.5vw, 2rem);
+      font-style: italic;
+      line-height: 1.7;
+      color: var(--text);
+      margin-bottom: 2.5rem;
+    }
+
+    .thought-meta {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      opacity: 0.4;
+      letter-spacing: 0.05em;
+      margin-bottom: 2rem;
+    }
+
+    /* Candle */
+    .candle-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 2.5rem;
+    }
+    .candle-big {
+      font-size: 2rem;
+      cursor: pointer;
+      transition: filter 0.3s, transform 0.3s;
+      filter: grayscale(0.5);
+    }
+    .candle-big:hover {
+      filter: drop-shadow(0 0 10px rgba(244,169,64,0.7));
+      transform: scale(1.1);
+    }
+    .candle-big.lit {
+      filter: drop-shadow(0 0 14px rgba(244,169,64,0.9));
+      animation: flicker 2s ease-in-out infinite;
+    }
+    @keyframes flicker {
+      0%, 100% { transform: scale(1) rotate(-1deg); }
+      50% { transform: scale(1.1) rotate(2deg); }
+    }
+    .candle-label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      opacity: 0.5;
+      letter-spacing: 0.1em;
+    }
+    .candle-count {
+      font-size: 0.85rem;
+      color: var(--candle);
+      opacity: 0.7;
+    }
+
+    /* Next btn */
+    .next-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: 'EB Garamond', serif;
+      font-size: 1rem; letter-spacing: 0.15em;
+      padding: 0.7rem 2rem;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .next-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .empty-state p {
+      font-style: italic;
+      color: var(--text-dim);
+      opacity: 0.5;
+      font-size: 1.1rem;
+    }
+    .empty-state a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid rgba(200,169,110,0.3);
+      padding-bottom: 2px;
+      transition: opacity 0.3s;
+    }
+    .empty-state a:hover { opacity: 0.7; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+<div class="glow"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">Home</a>
+  <a href="wall.html" class="back-link">← the wall</a>
+</nav>
+
+<main>
+  <div class="thought-display" id="thoughtDisplay">
+    <div class="tag-label" id="tagLabel">thought</div>
+    <div class="thought-text" id="thoughtText">loading...</div>
+    <div class="thought-meta" id="thoughtMeta">someone, just now</div>
+    <div class="candle-wrap">
+      <div class="candle-big" id="candleBtn" title="light a candle">🕯️</div>
+      <div class="candle-count" id="candleCount"></div>
+      <div class="candle-label">light a candle</div>
+    </div>
+    <button class="next-btn" id="nextBtn">show me another →</button>
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    <p>no one has left anything yet.</p>
+    <a href="post.html">be the first →</a>
+  </div>
+</main>
+
+<script>
+  // Stars
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 100; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${3+Math.random()*5}s;--delay:${Math.random()*6}s;--op:${0.15+Math.random()*0.4};width:${1+Math.random()*1.5}px;height:${1+Math.random()*1.5}px;`;
+    starsEl.appendChild(s);
+  }
+
+  const tagColors = { wish: 'tag-wish', regret: 'tag-regret', prayer: 'tag-prayer', thought: 'tag-thought' };
+
+  function getPosts() {
+    return JSON.parse(localStorage.getItem('home-posts') || '[]');
+  }
+  function savePosts(posts) {
+    localStorage.setItem('home-posts', JSON.stringify(posts));
+  }
+  function timeAgo(ts) {
+    const diff = Date.now() - ts;
+    const m = Math.floor(diff / 60000);
+    const h = Math.floor(m / 60);
+    const d = Math.floor(h / 24);
+    if (m < 1) return 'just now';
+    if (m < 60) return `${m}m ago`;
+    if (h < 24) return `${h}h ago`;
+    return `${d}d ago`;
+  }
+
+  let currentPost = null;
+  const display = document.getElementById('thoughtDisplay');
+  const emptyState = document.getElementById('emptyState');
+
+  function showRandom() {
+    const posts = getPosts();
+    if (posts.length === 0) {
+      display.style.display = 'none';
+      emptyState.style.display = 'flex';
+      return;
+    }
+
+    display.classList.remove('visible');
+
+    setTimeout(() => {
+      const randomPost = posts[Math.floor(Math.random() * posts.length)];
+      currentPost = randomPost;
+
+      // Update tag
+      const tagLabel = document.getElementById('tagLabel');
+      tagLabel.textContent = randomPost.tag;
+      display.className = `thought-display ${tagColors[randomPost.tag] || ''}`;
+
+      document.getElementById('thoughtText').textContent = `"${randomPost.text}"`;
+      document.getElementById('thoughtMeta').textContent = `someone, ${timeAgo(randomPost.ts)}`;
+
+      const candleBtn = document.getElementById('candleBtn');
+      const candleCount = document.getElementById('candleCount');
+      const isLit = (randomPost.candledBy || []).includes('me');
+      candleBtn.className = `candle-big ${isLit ? 'lit' : ''}`;
+      candleCount.textContent = randomPost.candles > 0 ? `${randomPost.candles} candle${randomPost.candles !== 1 ? 's' : ''} lit` : '';
+
+      display.classList.add('visible');
+    }, 300);
+  }
+
+  document.getElementById('candleBtn').addEventListener('click', () => {
+    if (!currentPost) return;
+    const posts = getPosts();
+    const post = posts.find(p => p.id === currentPost.id);
+    if (!post) return;
+
+    if (!post.candledBy) post.candledBy = [];
+    const candleBtn = document.getElementById('candleBtn');
+    const candleCount = document.getElementById('candleCount');
+
+    if (post.candledBy.includes('me')) {
+      post.candledBy = post.candledBy.filter(x => x !== 'me');
+      post.candles = Math.max(0, (post.candles || 1) - 1);
+      candleBtn.classList.remove('lit');
+    } else {
+      post.candledBy.push('me');
+      post.candles = (post.candles || 0) + 1;
+      candleBtn.classList.add('lit');
+    }
+
+    currentPost = post;
+    candleCount.textContent = post.candles > 0 ? `${post.candles} candle${post.candles !== 1 ? 's' : ''} lit` : '';
+    savePosts(posts);
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', showRandom);
+
+  showRandom();
+</script>
+</body>
+</html>
